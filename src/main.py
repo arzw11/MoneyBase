@@ -7,7 +7,7 @@ from redis import asyncio as aioredis
 from src.auth.auth import auth_backend, fastapi_users
 from src.auth.schemas import UserCreate, UserRead
 
-from src.account.router import router as router_account
+from src.wallet.router import router as router_wallet
 from src.operations.router import router as router_operation
 
 app = FastAPI(
@@ -26,7 +26,7 @@ app.include_router(
     tags=["auth"],
 )
 
-app.include_router(router_account)
+app.include_router(router_wallet)
 app.include_router(router_operation)
 
 @app.on_event("startup")

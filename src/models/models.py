@@ -1,11 +1,7 @@
 import datetime
 import enum
 
-from re import M
-import re
-from typing import Annotated, List
-from unicodedata import category
-
+from typing import Annotated, Dict, List
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 
 from sqlalchemy import Boolean, Float, String, ForeignKey, text
@@ -62,28 +58,28 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
 
-    accounts: Mapped[List["Account"]] = relationship(
+    wallets: Mapped[List["Wallet"]] = relationship(
         back_populates="user"
     )
     operations: Mapped[List["Operation"]] =relationship(
         back_populates="user_operations"
     )
 
-class Account(Base):
-    __tablename__ = "account"
+class Wallet(Base):
+    __tablename__ = "wallet"
 
     id: Mapped[intpk]
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
-    name: Mapped[str] = mapped_column(String(length=64), nullable=False, default="MyAccount")
+    name: Mapped[str] = mapped_column(String(length=64), nullable=False, default="MyWallet")
     budget: Mapped[float] = mapped_column(Float(precision=2), nullable=False, default=0)
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
 
     user: Mapped["User"] = relationship(
-        back_populates="accounts"
+        back_populates="wallets"
     )
-    operation: Mapped[List["Operation"]] = relationship(
-        back_populates="account_operations"
+    operations: Mapped[List["Operation"]] = relationship(
+        back_populates="wallet_operations"
     )
 
 
@@ -92,7 +88,7 @@ class Operation(Base):
 
     id: Mapped[intpk]
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
-    account_id: Mapped[int] = mapped_column(ForeignKey("account.id", ondelete="CASCADE"), nullable=False)
+    wallet_id: Mapped[int] = mapped_column(ForeignKey("wallet.id", ondelete="CASCADE"), nullable=False)
     category: Mapped[Category] = mapped_column(String, nullable=False)
     type_operation: Mapped[TypeOperation] = mapped_column(String, nullable=False)
     amount: Mapped[float] = mapped_column(Float(precision=2), default=0, nullable=False)
@@ -103,6 +99,6 @@ class Operation(Base):
         back_populates="operations"
     )
 
-    account_operations: Mapped["Account"] = relationship(
-        back_populates="operation"
+    wallet_operations: Mapped["Wallet"] = relationship(
+        back_populates="operations"
     )
